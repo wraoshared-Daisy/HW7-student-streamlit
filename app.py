@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 
 st.set_page_config(page_title="HW Case Checker (3 cases)", layout="wide")
-st.title("📈 Prediction Case Checker")
+st.title("📈 Load Prediction Case Checker")
 
 # ===================== 1. 配置文件 =====================
 CASE1_FILE = Path("case1_test.xlsx")   # 1天 = 24
@@ -188,12 +188,12 @@ with c1:
                     plt.tight_layout(pad=0.6)
                     st.pyplot(fig, use_container_width=False)
 
-                    show_leaderboard_html("best_case1", "🏆 Case 1 排行榜")
+    show_leaderboard_html("best_case1", "🏆 Case 1 排行榜")
 
 # ---------- Case 2 ----------
 with c2:
-    st.subheader("📅 Case 2：预测 7 天（168条）")
-    st.caption("上传：第一列 index，第二列你的预测；必须 168 行。")
+    st.subheader("📅 Case 2：预测 2 天（48条）")
+    st.caption("上传：第一列 index，第二列你的预测；必须 48 行。")
     up2 = st.file_uploader("上传 Case 2 预测", type=["xlsx", "xls", "csv"], key="up_case2")
 
     if up2 is not None:
@@ -209,7 +209,7 @@ with c2:
                 stu = df_stu.iloc[:, 0].reset_index(drop=True)
 
                 if len(stu) != len(truth):
-                    st.error(f"你上传了 {len(stu)} 行，但 Case 2 需要 {len(truth)} 行（7天=168条）。")
+                    st.error(f"你上传了 {len(stu)} 行，但 Case 2 需要 {len(truth)} 行（2天=48条）。")
                 else:
                     y_true = truth.values
                     y_pred = stu.values
@@ -226,12 +226,12 @@ with c2:
                     plt.tight_layout(pad=0.6)
                     st.pyplot(fig, use_container_width=False)
 
-                    show_leaderboard_html("best_case2", "🏆 Case 2 排行榜")
+    show_leaderboard_html("best_case2", "🏆 Case 2 排行榜")
 
 # ---------- Case 3 ----------
 with c3:
-    st.subheader("📅 Case 3：预测 30 天（720条）")
-    st.caption("上传：第一列 index，第二列你的预测；必须 720 行。")
+    st.subheader("📅 Case 3：预测 7 天（168条）")
+    st.caption("上传：第一列 index，第二列你的预测；必须 168 行。")
     up3 = st.file_uploader("上传 Case 3 预测", type=["xlsx", "xls", "csv"], key="up_case3")
 
     if up3 is not None:
@@ -247,7 +247,7 @@ with c3:
                 stu = df_stu.iloc[:, 0].reset_index(drop=True)
 
                 if len(stu) != len(truth):
-                    st.error(f"你上传了 {len(stu)} 行，但 Case 3 需要 {len(truth)} 行（30天≈720条）。")
+                    st.error(f"你上传了 {len(stu)} 行，但 Case 3 需要 {len(truth)} 行（7天=168条）。")
                 else:
                     y_true = truth.values
                     y_pred = stu.values
@@ -264,4 +264,4 @@ with c3:
                     plt.tight_layout(pad=0.6)
                     st.pyplot(fig, use_container_width=False)
 
-                    show_leaderboard_html("best_case3", "🏆 Case 3 排行榜")
+    show_leaderboard_html("best_case3", "🏆 Case 3 排行榜")
