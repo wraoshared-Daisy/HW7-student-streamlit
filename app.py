@@ -9,8 +9,8 @@ st.title("📈 Load Prediction Case Checker")
 
 # ===================== 1. 配置文件 =====================
 CASE1_FILE = Path("case1_test.xlsx")   # 1天 = 24
-CASE2_FILE = Path("case2_test.xlsx")   # 7天 = 168
-CASE3_FILE = Path("case3_test.xlsx")   # 30天 ≈ 720
+CASE2_FILE = Path("case2_test.xlsx")   # 2天? 你下面写的是48条，这里用文件实际行数做准
+CASE3_FILE = Path("case3_test.xlsx")   # 7天 = 168
 USER_FILE  = Path("users.xlsx")
 
 # ===================== 2. 检查标准答案 =====================
@@ -63,7 +63,20 @@ def rmse(a: np.ndarray, b: np.ndarray) -> float:
     return float(np.sqrt(np.mean((a - b) ** 2)))
 
 
+def cvrmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
+    """
+    CVRMSE = RMSE / mean(y_true) * 100%
+    如果平均值为0，就返回 NaN
+    """
+    rmse_val = rmse(y_true, y_pred)
+    mean_true = np.mean(y_true)
+    if mean_true == 0:
+        return np.nan
+    return rmse_val / mean_true * 100.0
+
+
 def update_user_best(student_id: str, col_name: str, score: float):
+    score = round(float(score), 2)
     dfu = load_users()
     idx = dfu[dfu["student_id"].astype(str) == str(student_id)].index
     if len(idx) != 1:
@@ -75,7 +88,7 @@ def update_user_best(student_id: str, col_name: str, score: float):
         save_users(dfu)
         st.success("🎉 成绩已更新！")
     else:
-        st.info(f"本次 RMSE = {score:.4f}，没有超过你当前最好成绩 {old:.4f}")
+        st.info(f"本次 CVRMSE = {score:.2f}，没有超过你当前最好成绩 {old:.2f}")
 
 
 def show_leaderboard_html(case_col: str, title: str):
@@ -176,13 +189,15 @@ with c1:
                     y_true = truth.values
                     y_pred = stu.values
                     r = rmse(y_true, y_pred)
-                    st.success(f"✅ Case 1 RMSE = {r:.4f}")
-                    update_user_best(st.session_state.current_user, "best_case1", r)
+                    cvr = cvrmse(y_true, y_pred)
+
+                    st.success(f"✅ Case 1 CVRMSE = {cvr:.2f}%")
+                    update_user_best(st.session_state.current_user, "best_case1", cvr)
 
                     fig, ax = plt.subplots(figsize=(4.5, 3), dpi=140)
                     ax.plot(y_true, label="Truth", linewidth=2, color="#1f77b4")
                     ax.plot(y_pred, label="Your Pred", linewidth=1.8, color="#d62728")
-                    ax.set_title(f"Case 1 (RMSE={r:.3f})", pad=5)
+                    ax.set_title(f"Case 1 (CVRMSE={cvr:.2f}%)", pad=5)
                     ax.grid(True, alpha=0.3)
                     ax.legend()
                     plt.tight_layout(pad=0.6)
@@ -214,13 +229,15 @@ with c2:
                     y_true = truth.values
                     y_pred = stu.values
                     r = rmse(y_true, y_pred)
-                    st.success(f"✅ Case 2 RMSE = {r:.4f}")
-                    update_user_best(st.session_state.current_user, "best_case2", r)
+                    cvr = cvrmse(y_true, y_pred)
+
+                    st.success(f"✅ Case 2 CVRMSE = {cvr:.2f}%")
+                    update_user_best(st.session_state.current_user, "best_case2", cvr)
 
                     fig, ax = plt.subplots(figsize=(4.5, 3), dpi=140)
                     ax.plot(y_true, label="Truth", linewidth=2, color="#1f77b4")
                     ax.plot(y_pred, label="Your Pred", linewidth=1.8, color="#d62728")
-                    ax.set_title(f"Case 2 (RMSE={r:.3f})", pad=5)
+                    ax.set_title(f"Case 2 (CVRMSE={cvr:.2f}%)", pad=5)
                     ax.grid(True, alpha=0.3)
                     ax.legend()
                     plt.tight_layout(pad=0.6)
@@ -252,13 +269,15 @@ with c3:
                     y_true = truth.values
                     y_pred = stu.values
                     r = rmse(y_true, y_pred)
-                    st.success(f"✅ Case 3 RMSE = {r:.4f}")
-                    update_user_best(st.session_state.current_user, "best_case3", r)
+                    cvr = cvrmse(y_true, y_pred)
+
+                    st.success(f"✅ Case 3 CVRMSE = {cvr:.2f}%")
+                    update_user_best(st.session_state.current_user, "best_case3", cvr)
 
                     fig, ax = plt.subplots(figsize=(4.5, 3), dpi=140)
                     ax.plot(y_true, label="Truth", linewidth=2, color="#1f77b4")
                     ax.plot(y_pred, label="Your Pred", linewidth=1.8, color="#d62728")
-                    ax.set_title(f"Case 3 (RMSE={r:.3f})", pad=5)
+                    ax.set_title(f"Case 3 (CVRMSE={cvr:.2f}%)", pad=5)
                     ax.grid(True, alpha=0.3)
                     ax.legend()
                     plt.tight_layout(pad=0.6)
